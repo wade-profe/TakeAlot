@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="All Test Suite">
+    <test name="Home Page Tests">
+        <parameter name="browser" value="chrome headless"/>
+        <classes>
+            <class name="wade.selenium.HomePageTest"/>
+        </classes>
+    </test>
+</suite>
