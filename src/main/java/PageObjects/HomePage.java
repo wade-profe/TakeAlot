@@ -13,6 +13,8 @@ public class HomePage {
     WebDriver driver;
     private List<WebElement> allLinks;
     Logger l;
+    private final String URL = "https://www.takealot.com/";
+
 
     public HomePage(WebDriver driver) {
         this.driver = driver;
@@ -20,7 +22,7 @@ public class HomePage {
         loadLinks();
     }
 
-    private void loadLinks(){
+    private void loadLinks() {
         l.trace("Loading all links on page");
         allLinks = driver.findElements(By.tagName("a"));
     }
@@ -49,5 +51,9 @@ public class HomePage {
 //        waitForAllLinksToLoad();
         l.info("Returning a list of " + allLinks.size() + " links");
         return allLinks;
+    }
+
+    public String getURL() {
+        return URL;
     }
 }

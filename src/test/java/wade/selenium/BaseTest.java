@@ -9,6 +9,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -16,19 +17,30 @@ import java.util.concurrent.TimeUnit;
 public class BaseTest {
 
     Logger l = LogManager.getLogger(BaseTest.class.getName());
+    static Properties properties;
+
+    static {
+        properties = new Properties();
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(System.getProperty("user.dir") + "\\global.properties");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            properties.load(fis);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public WebDriver initializeDriver(String browser) throws IOException {
-
         WebDriver driver;
         l.trace("Initializing driver for " + browser);
-        Properties properties = new Properties();
-        FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "\\global.properties");
-        properties.load(fis);
-
         if (browser.toLowerCase().contains("chrome")) {
             System.setProperty("webdriver.chrome.driver", properties.getProperty("chromedriver_path"));
             ChromeOptions options = new ChromeOptions();
-            if(browser.toLowerCase().contains("headless")){
+            if (browser.toLowerCase().contains("headless")) {
                 l.info("Setting Chromedriver to headless mode");
                 options.addArguments("--headless");
             }
@@ -36,7 +48,7 @@ public class BaseTest {
         } else if (browser.toLowerCase().contains("firefox")) {
             System.setProperty("webdriver.gecko.driver", properties.getProperty("geckodriver_path"));
             FirefoxOptions options = new FirefoxOptions();
-            if(browser.toLowerCase().contains("headless")){
+            if (browser.toLowerCase().contains("headless")) {
                 l.info("Setting Geckodriver to headless mode");
                 options.setHeadless(true);
             }
@@ -52,9 +64,10 @@ public class BaseTest {
             int implicitWaitTime = 5;
             l.trace("Setting implicit wait to " + implicitWaitTime);
             driver.manage().timeouts().implicitlyWait(implicitWaitTime, TimeUnit.SECONDS);
+            l.info("Opening the landing page");
+            driver.get(properties.getProperty("homePageUrl"));
         }
 
         return driver;
-
     }
 }
