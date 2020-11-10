@@ -10,4 +10,10 @@
             <class name="wade.selenium.HomePageTest"/>
         </classes>
     </test>
+    <test name="Search Page Tests">
+        <parameter name="browser" value="chrome"/>
+        <classes>
+            <class name="wade.selenium.SearchPageTest"/>
+        </classes>
+    </test>
 </suite>

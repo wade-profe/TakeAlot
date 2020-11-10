@@ -3,8 +3,11 @@ package PageObjects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 
 import java.util.List;
 
@@ -13,13 +16,13 @@ public class HomePage {
     WebDriver driver;
     private List<WebElement> allLinks;
     Logger l;
-    private final String URL = "https://www.takealot.com/";
-
+    @FindBy(name = "search")
+    WebElement search;
 
     public HomePage(WebDriver driver) {
         this.driver = driver;
+        PageFactory.initElements(driver, this);
         this.l = LogManager.getLogger(HomePage.class.getName());
-        loadLinks();
     }
 
     private void loadLinks() {
@@ -48,12 +51,15 @@ public class HomePage {
     }
 
     public List<WebElement> getAllLinks() throws InterruptedException {
-//        waitForAllLinksToLoad();
+        waitForAllLinksToLoad();
         l.info("Returning a list of " + allLinks.size() + " links");
         return allLinks;
     }
 
-    public String getURL() {
-        return URL;
+    public SearchResultPage performSearch(String searchQuery) {
+        search.click();
+        search.sendKeys(searchQuery);
+        search.sendKeys(Keys.ENTER);
+        return new SearchResultPage(this.driver, searchQuery);
     }
 }

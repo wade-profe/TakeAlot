@@ -7,10 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 import org.testng.asserts.SoftAssert;
 
 import java.io.IOException;
@@ -21,20 +18,21 @@ import java.util.List;
 public class HomePageTest extends BaseTest {
 
     public WebDriver driver;
+    WebDriverWait w;
     private Logger l;
 
     @BeforeTest
     @Parameters("browser")
-    public void intializeTest(String browser) throws IOException {
+    public void intializeTest(String browser) throws IOException, InterruptedException {
         l = LogManager.getLogger(HomePageTest.class.getName());
         l.info("Initializing driver");
         driver = initializeDriver(browser);
-        WebDriverWait w = new WebDriverWait(driver, 10);
+        w = new WebDriverWait(driver, 10);
     }
 
-    @Test
+    @Test(enabled = false)
     public void checkPageTitle() {
-        Assert.assertEquals(driver.getTitle(), "Takealot.com: Onine Shopping | SA's leading online store");
+        Assert.assertEquals(driver.getTitle(), "Takealot.com: Online Shopping | SA's leading online store");
     }
 
     @Test(enabled = false)
@@ -42,7 +40,6 @@ public class HomePageTest extends BaseTest {
         SoftAssert a = new SoftAssert();
         l.trace("Retrieving HomePage object");
         HomePage homePage = new HomePage(driver);
-        l.trace("Retrieving all page links");
         List<WebElement> allLinks = homePage.getAllLinks();
         int index = -1;
         for (WebElement link : allLinks) {
@@ -53,7 +50,7 @@ public class HomePageTest extends BaseTest {
                 conn.setConnectTimeout(5000);
                 conn.connect();
                 int responseCode = conn.getResponseCode();
-                if(responseCode >= 400){
+                if (responseCode >= 400) {
                     l.error("Link with text " + link.getText() + " at index " + index + " is broken, response code = " + responseCode);
                 }
                 a.assertTrue(responseCode < 400);
@@ -66,10 +63,14 @@ public class HomePageTest extends BaseTest {
         a.assertAll();
     }
 
+    @AfterMethod
+    public void returnToLandingPage() {
+        returnToLandingPage(driver);
+    }
+
     @AfterTest
-    public void teardown(){
+    public void teardown() {
         l.trace("Quitting driver");
         driver.quit();
     }
-
 }
