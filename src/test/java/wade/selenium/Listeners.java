@@ -16,11 +16,11 @@ import java.util.Calendar;
 
 public class Listeners implements ITestListener {
 
-    Logger l = LogManager.getLogger(HomePageTest.class.getName());
+    Logger l = LogManager.getLogger(Listeners.class.getName());
 
     @Override
     public void onTestStart(ITestResult result) {
-        l.info("Starting test: " + result.getName());
+        l.info("Starting test: " + result.getName() + " from " + result.getTestClass().getRealClass().getSimpleName());
     }
 
     @Override
@@ -37,10 +37,11 @@ public class Listeners implements ITestListener {
         } catch (IllegalAccessException | NoSuchFieldException e) {
             l.fatal(e.getMessage());
         }
+        l.trace("Creating a screenshot of the error page");
         File src = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         try {
-            FileUtils.copyFile(src, new File(System.getProperty("user.dir") + "\\src\\Logs\\" +
-                    result.getName() + " - [" + Calendar.getInstance().getTime().toString().replace(":", "-") + "]" + ".png"));
+            FileUtils.copyFile(src, new File(System.getProperty("user.dir") + "\\src\\Logs\\Screenshots\\" +
+                    result.getName() + " failure - [" + Calendar.getInstance().getTime().toString().replace(":", "-") + "]" + ".png"));
         } catch (IOException e) {
             l.fatal(e.getMessage());
         }
@@ -48,6 +49,7 @@ public class Listeners implements ITestListener {
 
     @Override
     public void onTestSkipped(ITestResult result) {
+        l.info("Skipping " + result.getName());
 
     }
 

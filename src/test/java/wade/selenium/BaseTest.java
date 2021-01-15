@@ -12,6 +12,7 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.asserts.SoftAssert;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,6 +26,7 @@ public class BaseTest {
     static Properties properties;
     Actions actions;
     WebDriverWait w;
+    SoftAssert a;
 
     static {
         properties = new Properties();
@@ -42,13 +44,14 @@ public class BaseTest {
     }
 
     public WebDriver initializeDriver(String browser) throws InterruptedException {
+        a = new SoftAssert();
         WebDriver driver;
-        l.trace("Initializing driver for " + browser);
+        l.info("Initializing driver for " + browser);
         if (browser.toLowerCase().contains("chrome")) {
             System.setProperty("webdriver.chrome.driver", properties.getProperty("chromedriver_path"));
             ChromeOptions options = new ChromeOptions();
             if (browser.toLowerCase().contains("headless")) {
-                l.info("Setting Chromedriver to headless mode");
+                l.debug("Setting Chromedriver to headless mode");
                 options.addArguments("--headless");
             }
             driver = new ChromeDriver(options);
@@ -56,7 +59,7 @@ public class BaseTest {
             System.setProperty("webdriver.gecko.driver", properties.getProperty("geckodriver_path"));
             FirefoxOptions options = new FirefoxOptions();
             if (browser.toLowerCase().contains("headless")) {
-                l.info("Setting Geckodriver to headless mode");
+                l.debug("Setting Geckodriver to headless mode");
                 options.setHeadless(true);
             }
             driver = new FirefoxDriver(options);
@@ -71,27 +74,22 @@ public class BaseTest {
             int implicitWaitTime = 5;
             l.trace("Setting implicit wait to " + implicitWaitTime);
             driver.manage().timeouts().implicitlyWait(implicitWaitTime, TimeUnit.SECONDS);
-            l.info("Opening the landing page");
+            l.trace("Opening the landing page");
             driver.get(properties.getProperty("homePageUrl"));
             w = new WebDriverWait(driver, 5);
             try {
                 w.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("img[alt*='Promotional popup']")));
-                Actions actions = new Actions(driver);
+                actions = new Actions(driver);
                 actions.sendKeys(Keys.ESCAPE).build().perform();
             } catch (Exception e) {
 
             }
-//            w.until(ExpectedConditions.invisibilityOfElementLocated(By.className("loader")));
-//            if(driver.findElement(By.cssSelector("img[alt*='Promotional popup']")).isDisplayed()){
-//                Actions actions = new Actions(driver);
-//                actions.sendKeys(Keys.ESCAPE).build().perform();
-//            }
         }
-
         return driver;
     }
 
     public void returnToLandingPage(WebDriver driver) {
+        l.debug("Returning to the landing page");
         driver.get(properties.getProperty("homePageUrl"));
     }
 }

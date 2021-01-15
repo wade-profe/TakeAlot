@@ -23,10 +23,11 @@ public class HomePage {
         this.driver = driver;
         PageFactory.initElements(driver, this);
         this.l = LogManager.getLogger(HomePage.class.getName());
+        l.trace("Creating home page object");
     }
 
     private void loadLinks() {
-        l.trace("Loading all links on page");
+        l.trace("Gathering all links currently on the page into a list");
         allLinks = driver.findElements(By.tagName("a"));
     }
 
@@ -40,11 +41,12 @@ public class HomePage {
     private void waitForAllLinksToLoad() throws InterruptedException {
         l.info("Waiting for all the links on the page to load");
         while(true){
+            loadLinks();
             int baseSize = allLinks.size();
             Thread.sleep(1000);
             loadLinks();
             if(allLinks.size() == baseSize){
-                l.trace("No new links loaded after 1 second. Returning current links");
+                l.trace("No new links loaded after 1 second");
                 break;
             }
         }
@@ -52,11 +54,12 @@ public class HomePage {
 
     public List<WebElement> getAllLinks() throws InterruptedException {
         waitForAllLinksToLoad();
-        l.info("Returning a list of " + allLinks.size() + " links");
+        l.info("Acquired a list of " + allLinks.size() + " links on the current page");
         return allLinks;
     }
 
     public SearchResultPage performSearch(String searchQuery) {
+        l.trace("Performing a search for " + searchQuery);
         search.click();
         search.sendKeys(searchQuery);
         search.sendKeys(Keys.ENTER);

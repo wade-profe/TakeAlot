@@ -10,7 +10,6 @@ import org.testng.Assert;
 import org.testng.annotations.*;
 import org.testng.asserts.SoftAssert;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -23,10 +22,10 @@ public class HomePageTest extends BaseTest {
 
     @BeforeTest
     @Parameters("browser")
-    public void intializeTest(String browser) throws IOException, InterruptedException {
+    public void intializeTest(String browser) throws InterruptedException {
         l = LogManager.getLogger(HomePageTest.class.getName());
-        l.info("Initializing driver");
         driver = initializeDriver(browser);
+        l.debug("Creating an explicit wait object");
         w = new WebDriverWait(driver, 10);
     }
 
@@ -37,8 +36,9 @@ public class HomePageTest extends BaseTest {
 
     @Test(enabled = false)
     public void checkAllLinks() throws InterruptedException {
+        l.debug("Creating a TestNg soft assert object");
         SoftAssert a = new SoftAssert();
-        l.trace("Retrieving HomePage object");
+        l.debug("Retrieving HomePage object");
         HomePage homePage = new HomePage(driver);
         List<WebElement> allLinks = homePage.getAllLinks();
         int index = -1;
@@ -57,7 +57,7 @@ public class HomePageTest extends BaseTest {
 
             } catch (Exception e) {
                 l.error("Link with text " + link.getText() + " at index " + index + "threw an exception: " + e.getMessage());
-                a.assertTrue(false);
+                a.assertTrue(false, "A link test threw an exception");
             }
         }
         a.assertAll();
@@ -70,7 +70,7 @@ public class HomePageTest extends BaseTest {
 
     @AfterTest
     public void teardown() {
-        l.trace("Quitting driver");
+        l.info("Quitting driver");
         driver.quit();
     }
 }
