@@ -29,12 +29,12 @@ public class HomePageTest extends BaseTest {
         w = new WebDriverWait(driver, 10);
     }
 
-    @Test(enabled = false)
+    @Test()
     public void checkPageTitle() {
         Assert.assertEquals(driver.getTitle(), "Takealot.com: Online Shopping | SA's leading online store");
     }
 
-    @Test(enabled = false)
+    @Test()
     public void checkAllLinks() throws InterruptedException {
         l.debug("Creating a TestNg soft assert object");
         SoftAssert a = new SoftAssert();
@@ -51,7 +51,7 @@ public class HomePageTest extends BaseTest {
                 conn.connect();
                 int responseCode = conn.getResponseCode();
                 if (responseCode >= 400) {
-                    l.error("Link with text " + link.getText() + " at index " + index + " is broken, response code = " + responseCode);
+                    l.error("Link with text " + link.getText() + " with URL " + link.getAttribute("href") + "is broken, response code = " + responseCode);
                 }
                 a.assertTrue(responseCode < 400);
 

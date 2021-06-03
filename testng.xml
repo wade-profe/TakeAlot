@@ -5,13 +5,13 @@
         <listener class-name="wade.selenium.Listeners"/>
     </listeners>
     <test name="Home Page Tests">
-        <parameter name="browser" value="chrome"/>
+        <parameter name="browser" value="firefox headless"/>
         <classes>
             <class name="wade.selenium.HomePageTest"/>
         </classes>
     </test>
-    <test name="Search Page Tests">
-        <parameter name="browser" value="chrome"/>
+    <test name="Search Tests">
+        <parameter name="browser" value="firefox headless"/>
         <classes>
             <class name="wade.selenium.SearchPageTest"/>
         </classes>

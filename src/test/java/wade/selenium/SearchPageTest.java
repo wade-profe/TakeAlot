@@ -31,7 +31,7 @@ public class SearchPageTest extends BaseTest {
         w = new WebDriverWait(driver, 10);
     }
 
-    @Test(dataProvider = "searchTerms", enabled = false)
+    @Test(dataProvider = "searchTerms")
     public void checkSearch(String searchTerm) {
         HomePage homePage = new HomePage(driver);
         SearchResultPage searchResultPage = homePage.performSearch(searchTerm);
@@ -48,7 +48,7 @@ public class SearchPageTest extends BaseTest {
     }
 
     @Test(dataProvider = "searchTerms")
-    public void testSorting(String searchTerm) {
+    public void testSorting(String searchTerm) throws InterruptedException {
         l.trace("Running test with searchTerm: " + searchTerm);
         HomePage homePage = new HomePage(driver);
         SearchResultPage searchResultPage = homePage.performSearch(searchTerm);
@@ -60,10 +60,9 @@ public class SearchPageTest extends BaseTest {
         filterOptions.forEach((we) -> {
             filterOptionsText.add(we.getText());
         });
-        List<Integer> prices;
+        List<WebElement> results;
         int referencePrice;
         double referenceRating;
-        List<Double> ratings;
         int errors = 0;
         for (String option : filterOptionsText) {
             l.info("Sorting by " + option);
@@ -72,42 +71,48 @@ public class SearchPageTest extends BaseTest {
             w.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("div[class*='listing-container-module_fade-cards']")));
             switch (option) {
                 case "Price: High to Low":
-                    prices = searchResultPage.getAllPrices();
+                    results = searchResultPage.loadAllResults();
                     referencePrice = Integer.MAX_VALUE;
-                    for (Integer currentPrice : prices) {
+                    for (WebElement e : results) {
+                        Integer currentPrice = searchResultPage.getResultPrice(e);
                         if (!(currentPrice <= referencePrice)) {
+                            searchResultPage.scrollToElement(e);
                             l.fatal("Error with sort - " + option + " - the current price is " + currentPrice +
                                     " but the previous price was " + referencePrice);
-//                            searchResultPage.takeScreenshot(option + " sorting error");
+                            searchResultPage.takeScreenshot(option.replace(":", "-") + " sorting error");
                             errors++;
                         }
                         referencePrice = currentPrice;
                     }
                     break;
                 case "Price: Low to High":
-                    prices = searchResultPage.getAllPrices();
+                    results = searchResultPage.loadAllResults();
                     referencePrice = Integer.MIN_VALUE;
-                    for (Integer currentPrice : prices) {
+                    for (WebElement e : results) {
+                        Integer currentPrice = searchResultPage.getResultPrice(e);
                         if (!(currentPrice >= referencePrice)) {
+                            searchResultPage.scrollToElement(e);
                             l.fatal("Error with sort - " + option + " - the current price is " + currentPrice +
                                     " but the previous price was " + referencePrice);
-//                            searchResultPage.takeScreenshot(option + " sorting error");
+                            searchResultPage.takeScreenshot(option.replace(":", "-") + " sorting error");
                             errors++;
                         }
                         referencePrice = currentPrice;
                     }
                     break;
                 case "Top Rated":
-                    ratings = searchResultPage.getAllRatings();
+                    results = searchResultPage.loadAllResults();
                     referenceRating = 5.0;
-                    for (Double rating : ratings) {
-                        if (!(rating <= referenceRating)) {
-                            l.fatal("Error with sort - " + option + " - the current rating is " + rating +
+                    for (WebElement e : results) {
+                        double currentRating = searchResultPage.getResultRating(e);
+                        if (!(currentRating <= referenceRating)) {
+                            searchResultPage.scrollToElement(e);
+                            l.fatal("Error with sort - " + option + " - the current rating is " + currentRating +
                                     " but the previous rating was " + referenceRating);
-//                            searchResultPage.takeScreenshot(option + " sorting error");
+                            searchResultPage.takeScreenshot(option + " sorting error");
                             errors++;
                         }
-                        referenceRating = rating;
+                        referenceRating = currentRating;
                     }
                     break;
                 default:
@@ -134,11 +139,11 @@ public class SearchPageTest extends BaseTest {
 
     @DataProvider
     public Object[] searchTerms() {
-        Object[] searchTerms = new Object[2];
-        searchTerms[0] = "hisense";
+        Object[] searchTerms = new Object[4];
+        searchTerms[0] = "senheiser";
         searchTerms[1] = "brandy";
-//        searchTerms[2] = "nappies";
-//        searchTerms[3] = "kindle";
+        searchTerms[2] = "nappies";
+        searchTerms[3] = "kindle";
         return searchTerms;
     }
 

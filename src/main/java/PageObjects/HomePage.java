@@ -32,7 +32,7 @@ public class HomePage {
     }
 
     /*
-    Implemented as a more robust way to make sure as many links a spossible are loaded on the landing page before testing,
+    Implemented as a more robust way to make sure as many links as possible are loaded on the landing page before testing,
     as there is considerable lag between when driver considers the page fully loaded and when all possible links are loaded
     The more elegant solution would usually be the below, but it was not performing satisfactorily in this case:
         new WebDriverWait(firefoxDriver, pageLoadTimeout).until(

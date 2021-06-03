@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
@@ -6,6 +7,8 @@ public class Scratchpad {
     public static void main(String[] args) {
 
         Random rand = new Random();
+
+        System.out.println(Calendar.getInstance().getTime().toString());
 
         String[] luke = {"lu", "ke"};
         String[] hilary = {"hil", "ary"};

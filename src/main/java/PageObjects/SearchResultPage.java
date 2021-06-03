@@ -12,10 +12,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SearchResultPage {
 
@@ -29,16 +29,10 @@ public class SearchResultPage {
     WebElement loadMore;
     @FindBy(how = How.ID_OR_NAME, using = "searchDrop")
     WebElement filter;
-    private WebDriver driver;
-    private String searchQuery;
-    private Logger l;
-    private WebDriverWait w;
-
-    // TODO Investigate whether headless mode works
-    //
-    //TODO Add firefox test suite
-    //
-    //TODO ExtentReport
+    private final WebDriver driver;
+    private final String searchQuery;
+    private final Logger l;
+    private final WebDriverWait w;
 
     public SearchResultPage(WebDriver driver, String searchQuery) {
         this.driver = driver;
@@ -58,7 +52,7 @@ public class SearchResultPage {
         l.trace("Taking a screenshot of the current page");
         File src = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         try {
-            FileUtils.copyFile(src, new File(System.getProperty("user.dir") + "\\src\\Logs\\Screenshots\\" +
+            FileUtils.copyFile(src, new File(System.getProperty("user.dir") + "\\src\\Logs\\Screenshots\\" + this.getClass().getName() + "-" + LocalDate.now() + "\\" +
                     description + " - " + Calendar.getInstance().getTime().toString().replace(":", "-") + ".png"));
         } catch (IOException e) {
             l.fatal(e.getMessage());
@@ -93,41 +87,43 @@ public class SearchResultPage {
         return filter;
     }
 
-    public List<Integer> getAllPrices() {
-        loadAllResults();
-        l.trace("Retrieving all the prices of the search results");
-        List<WebElement> priceElements = driver.findElements(priceBy);
-        priceElements = priceElements.stream().filter(we -> !(we.getText().toLowerCase().contains("from"))).collect(Collectors.toList());
-        List<String[]> priceStrings = new ArrayList<>(priceElements.size());
-        priceElements.forEach((e) -> {
-            priceStrings.add(e.getText().split("R"));
-        });
-        List<Integer> prices = new ArrayList<>(priceElements.size());
-        priceStrings.forEach((s) -> {
-            prices.add(Integer.parseInt(s[1].replace(",", "").trim()));
-        });
-        return prices;
-    }
-
-    public List<Double> getAllRatings() {
-        loadAllResults();
-        l.trace("Retrieving all the ratings of the search results");
-        List<WebElement> ratingElements = driver.findElements(ratingBy);
-        List<String[]> ratingStrings = new ArrayList<>(ratingElements.size());
-        ratingElements.forEach((we) -> {
-            ratingStrings.add(we.getText().split(" "));
-        });
-        List<Double> ratings = new ArrayList<>(ratingStrings.size());
-        ratingStrings.forEach((s) -> {
-            ratings.add(Double.parseDouble(s[0].trim()));
-        });
-        return ratings;
-    }
-
-    public void loadAllResults() {
+    public List<WebElement> loadAllResults() {
         l.trace("Loading all the results on the page");
         while (moreResultsAvailable()) {
             loadMore();
         }
+        return driver.findElements(resultBy);
+    }
+
+    private String priceParser(String s) {
+        return Arrays.asList(s.split("R")).get(1).replace(",", "").trim();
+    }
+
+    private String ratingParser(String s) {
+        return Arrays.asList(s.split(" ")).get(0).trim();
+    }
+
+    public Integer getResultPrice(WebElement resultElement) {
+        int nthChild = resultElement.
+                findElements(By.cssSelector("div[class*='card-section'] div[class*='price-wrapper'] ul li:nth-child(1) span")).
+                size();
+        return Integer.parseInt(priceParser(resultElement.
+                findElement(By.cssSelector("div[class*='card-section'] div[class*='price-wrapper'] ul li:nth-child(1) span:nth-child(" +
+                        nthChild + ")")).getText()));
+    }
+
+    public double getResultRating(WebElement resultElement) {
+        try {
+            return Double.parseDouble(ratingParser(resultElement.
+                    findElement(By.cssSelector("div[class*='product-card'] div[class*='card-section'] div[class*='rating']")).getText()));
+        } catch (NoSuchElementException n) {
+            l.trace("No rating found for result. Returning 0.0");
+            return 0.0;
+        }
+    }
+
+    public void scrollToElement(WebElement e) throws InterruptedException {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", e);
+        Thread.sleep(500);
     }
 }

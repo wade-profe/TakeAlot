@@ -17,6 +17,7 @@ import java.util.Calendar;
 public class Listeners implements ITestListener {
 
     Logger l = LogManager.getLogger(Listeners.class.getName());
+    WebDriver driver;
 
     @Override
     public void onTestStart(ITestResult result) {
@@ -31,7 +32,6 @@ public class Listeners implements ITestListener {
     @Override
     public void onTestFailure(ITestResult result) {
         l.fatal("Test " + result.getName() + " failed: " + result.getThrowable());
-        WebDriver driver = null;
         try {
             driver = (WebDriver) result.getTestClass().getRealClass().getDeclaredField("driver").get(result.getInstance());
         } catch (IllegalAccessException | NoSuchFieldException e) {
@@ -70,6 +70,5 @@ public class Listeners implements ITestListener {
 
     @Override
     public void onFinish(ITestContext context) {
-
     }
 }

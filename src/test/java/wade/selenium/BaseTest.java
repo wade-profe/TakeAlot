@@ -43,7 +43,7 @@ public class BaseTest {
         }
     }
 
-    public WebDriver initializeDriver(String browser) throws InterruptedException {
+    public WebDriver initializeDriver(String browser) {
         a = new SoftAssert();
         WebDriver driver;
         l.info("Initializing driver for " + browser);
@@ -53,7 +53,10 @@ public class BaseTest {
             if (browser.toLowerCase().contains("headless")) {
                 l.debug("Setting Chromedriver to headless mode");
                 options.addArguments("--headless");
+                options.addArguments("--start-maximized");
+                options.addArguments("--window-size=1920,1080");
             }
+
             driver = new ChromeDriver(options);
         } else if (browser.toLowerCase().contains("firefox")) {
             System.setProperty("webdriver.gecko.driver", properties.getProperty("geckodriver_path"));
